@@ -4,7 +4,7 @@ SOME LOG
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        // write your code here
+    
      /*   Map hashMap = new HashMap<>();
         hashMap.put("a","a");
         Set entrySet = hashMap.entrySet();
