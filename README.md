@@ -153,7 +153,15 @@ public class Main {
                 }
             }
         },"A").start();*/
+	//compare  object wait/notify   and  Lock  await/signal   
+	/*
+	when use notify the syn objec will choose some one wait thread random , maybe the syn obj is used by other thread and other usage. 
+	Some wirte by other:
+   	 例如 用wait/notify 实现阻塞队列时，当生产者put队列已满，所有的生产者现场阻塞，某个时刻消费者消费了一个元素，则需要唤醒某个生产者线程，而通过 Object notify 方式唤醒的线程不能确保一定就是一个生产者线程，因为 notify 是随机唤醒某一个正在该 synchronized 对应的锁上面通过 wait 方式阻塞的线程，如果这时正好还有消费者线程也在阻塞中，则很可能唤醒的是一个消费者线程；signalAll 更是会唤醒所有在对应锁上通过 wait 方式阻塞的线程，而不管是生产者还是消费者线程。
+   	 与之不同的 Condition await, signal 方式则可以对应多个谓词条件（notEmpty, notFull），可以很方便的实现让生产者线程和消费者线程分别在不同的谓词条件上进行等待
 
+
+	*/	
         }
 
 }
