@@ -1,6 +1,14 @@
 package src;
 
+import java.io.*;
 import java.math.BigInteger;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main{
 
@@ -217,10 +225,15 @@ public class Main{
         }
         IntAtomic main = new IntAtomic();
         main.getAndIncrease();*/
-        //Cache Line effect. Three cache level first and second used for one core of cpu, third can used for core of cpu in same slot.
-        //cache read data unit from memory is cache line usually is 64 byte. one line can storage 8 long type data. so access successive data
-        //is more fast.
-        long arr[][] = new long[1024*1024][];
+        //Cache Line effect. Three cache level first and second used for one core of cpu, third can used for core of
+        // cpu in same slot. cache read data unit from memory is cache line usually is 64 byte. one line can storage 8
+        // long type data. so access successive data is more fast.
+
+        //FalseShare problem caused in multi thread on change different data in same cache line, cpu core will
+        // competition the ownership of cache line,and one get then change data will cause this cache line invalidate
+        // even other thread are using. Content data for exist in different cache line, 1.6,1.7 use 7 long contention
+        // data. 1.8 can ues @Contended on class or field level.
+       /* long arr[][] = new long[1024*1024][];
         BigInteger sum = BigInteger.ZERO;
         for(int i=0; i<1024*1024; i++){
             arr[i] = new long[8];
@@ -232,7 +245,7 @@ public class Main{
         long startTime = System.currentTimeMillis();
         for(int i=0; i<1024*1024; i++){
             for(int j = 0;j<8;j++){
-//                sum = sum.add(BigInteger.valueOf(arr[i][j]));
+                //sum = sum.add(BigInteger.valueOf(arr[i][j]));
                 long c = arr[i][j];
             }
         }
@@ -244,14 +257,58 @@ public class Main{
         startTime = System.currentTimeMillis();
         for(int j = 0;j<8;j++){
             for(int i=0; i<1024*1024; i++){
-//                sum = sum.add(BigInteger.valueOf(arr[i][j]));
+                // sum = sum.add(BigInteger.valueOf(arr[i][j]));
                long c = arr[i][j];
             }
         }
-        System.out.println("cost time :"+(System.currentTimeMillis()-startTime)+" ms, result is"+sum );
+        System.out.println("cost time :"+(System.currentTimeMillis()-startTime)+" ms, result is"+sum );*/
+        //
+        ExecutorService excutorService = Executors.newFixedThreadPool(50);
+
     }
 
 
+}
+
+
+//communicate main thread to sub thread implement by Pipe
+class Piped {
+    public static void main(String[] args) throws Exception {
+        PipedWriter out = new PipedWriter();
+        PipedReader in = new PipedReader();
+// 将输出流和输入流进行连接，否则在使用时会抛出IOException
+        out.connect(in);
+        Thread printThread = new Thread(new Print(in), "PrintThread");
+        printThread.start();
+        BufferedReader filein = new BufferedReader(new InputStreamReader(new FileInputStream("E:\\wqdaily\\test.txt"),"utf-8"));
+
+        char[] cbuffer = new char[1024];
+
+        int receive = 0;
+        try {
+            while ((receive = filein.read(cbuffer)) != -1) {
+                out.write(cbuffer,0,receive);
+                out.write("----------------one write one write -------------");
+            }
+        } finally {
+            out.close();
+        }
+    }
+    static class Print implements Runnable {
+        private PipedReader in;
+        public Print(PipedReader in) {
+            this.in = in;
+        }
+        public void run() {
+            int receive = 0;
+            try {
+                while ((receive = in.read()) != -1) {
+                    System.out.print((char) receive);
+                }
+            } catch (IOException ex) {
+            }
+        }
+    }
 }
 
 
