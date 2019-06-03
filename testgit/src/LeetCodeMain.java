@@ -3,13 +3,13 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 class Solution {
-    //findKthLargest
+    /**
+     *   findKthLargest
+     */
+
     public int findKthLargest(int[] nums, int k) {
         return q_select(nums, 0, nums.length-1, nums.length+1-k);
     }
@@ -117,6 +117,7 @@ class Solution {
         array[i]= array[j];
         array[j] = tem;
     }
+
     /**
      *    union-find-set
      */
@@ -170,7 +171,94 @@ class Solution {
         }
     }
 
-    //
+    /**
+     * constructMaximumBinaryTree
+     */
+
+     // Definition for a binary tree node.
+     class TreeNode {
+          int val;
+          TreeNode left;
+          TreeNode right;
+          TreeNode(int x) { val = x; }
+
+         @Override
+         public String toString() {
+             return "{" +
+                     "val=" + val +
+                     ", left=" + left +
+                     ", right=" + right +
+                     '}';
+         }
+     }
+
+    public TreeNode constructMaximumBinaryTree(int[] nums) {
+        return constructMaximumBinaryTree(nums, 0, nums.length-1);
+    }
+    //3,2,1,6,0,5
+    public TreeNode constructMaximumBinaryTree(int[] nums, int start, int end){
+        if(start>end){
+            return null;
+        }else if(start == end){
+            return new TreeNode(nums[start]);
+        }else{
+            int max = nums[start];
+            int maxIndex = start;
+            for(int i=start+1;i<=end;i++){
+                if(nums[i]>max) {
+                    max = nums[i];
+                    maxIndex = i;
+                }
+            }
+            TreeNode node = new TreeNode(max);
+            node.left = constructMaximumBinaryTree(nums,  start, maxIndex-1);
+            node.right = constructMaximumBinaryTree(nums,maxIndex+1,end);
+
+            return node;
+        }
+
+    }
+    /**
+     * 辅助遍历树
+     * @param current
+     */
+    void reverse(TreeNode current){
+        if(current== null){
+            return;
+        }else{
+            System.out.println(current.val);
+            System.out.println("  left:"+current.left);
+            System.out.println("  right:"+current.right);
+            reverse(current.left);
+            reverse(current.right);
+        }
+
+    }
+
+    /**
+     * lcs findLength
+     * @param A
+     * @param B
+     * @return
+     */
+    public  int findLength(int[] A, int[] B) {
+        int[][] lcs = new int[A.length+1][B.length+1];
+
+
+        for(int i=1;i<=A.length;i++){
+
+            for(int j=1;j<=B.length;j++){
+               if(A[i-1] == B[j-1]){
+                    lcs[i][j] = lcs[i-1][j-1]+1;
+                }else{
+                    lcs[i][j] = lcs[i-1][j] > lcs[i][j-1] ? lcs[i-1][j] : lcs[i][j-1];
+                }
+            }
+        }
+        //return nowMaxRow[A.length];
+        return lcs[A.length][B.length];
+    }
+
 }
 /**
  * 380. Insert Delete GetRandom O(1)    hashtable
@@ -261,6 +349,18 @@ public class LeetCodeMain {
 //        obj.getRandom();
 //        obj.remove(0);
 //        obj.insert(0);
-
-        }
+        /**
+         *constructMaximumBinaryTree
+         */
+//        int[] param = {3,2,1,6,0,5};
+//        Solution.TreeNode res = new Solution().constructMaximumBinaryTree(param);
+//        new Solution().reverse(res);
+        /**
+         * lcs findLength
+         */
+        int[] a = {1,2,3,2,1};
+        int[] b = {3,2,1,4,7};
+        int longest = new Solution().findLength(a, b);
+        System.out.print(longest);
+    }
 }

@@ -1,3 +1,5 @@
+package src;
+
 import java.lang.instrument.Instrumentation;
 
 public class InstrumemtationGetObjectShallowSizeAgent {
