@@ -1,4 +1,4 @@
-package src;
+package src.instrument;
 
 import com.sun.tools.attach.*;
 
@@ -19,7 +19,7 @@ public class AttachMain {
         System.out.println(Arrays.toString(args));
         try {
             VirtualMachine vm =  VirtualMachine.attach(args[0]);
-            vm.loadAgent("E:\\wqdaily\\codespaces\\instrumemtationTest\\target\\instrumemtationTest-1.0-SNAPSHOT.jar");
+            vm.loadAgent("E:\\wqdaily\\codespaces\\testgit\\target\\instrumemtationTest-1.0-SNAPSHOT.jar");
 
         } catch (AttachNotSupportedException e) {
             e.printStackTrace();
