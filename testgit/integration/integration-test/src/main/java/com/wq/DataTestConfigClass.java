@@ -2,6 +2,9 @@ package com.wq;
 
 import com.mongodb.util.JSON;
 import com.wq.db.IDaoTest;
+import com.wq.kafka.IKafkaDataHandle;
+import com.wq.kafka.KafkaReceiverProcessor;
+import com.wq.kafka.KafkaSenderProcessor;
 import com.wq.mongodb.IMongodbDao;
 import com.wq.redis.RedisDataService;
 import org.junit.Test;
@@ -74,4 +77,22 @@ public class DataTestConfigClass {
 
         System.out.println(memberRecordMaps);
     }
+
+    @Test
+    public void kafkaTest(){
+
+        KafkaSenderProcessor senderProcessor = new KafkaSenderProcessor();
+        senderProcessor.send("kafkaTestData1", "kafkaTest");
+
+        KafkaReceiverProcessor kafkaReceiverProcessor = new KafkaReceiverProcessor("kafkaTest", new IKafkaDataHandle(){
+            @Override
+            public void doDataHandleLogic(String data) {
+                System.out.println("receive data: " + data);
+            }
+        });
+
+        kafkaReceiverProcessor.pollData();
+
+    }
+
 }
