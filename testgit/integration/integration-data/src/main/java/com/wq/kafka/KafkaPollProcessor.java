@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Properties;
 
 
-public class KafkaReceiverProcessor {
+public class KafkaPollProcessor {
 
-	private Logger logger = LoggerFactory.getLogger(KafkaReceiverProcessor.class);
+	private Logger logger = LoggerFactory.getLogger(KafkaPollProcessor.class);
 	
 	private Long maxFetchDataTime = 30 * 1000L;
 			
@@ -23,8 +23,8 @@ public class KafkaReceiverProcessor {
 	private IKafkaDataHandle kafkaDataHandle;
 
 
-	public KafkaReceiverProcessor(String topic, IKafkaDataHandle kafkaDataHandleLogic){
-		init(topic);
+	public KafkaPollProcessor(String server, String topic, String group, IKafkaDataHandle kafkaDataHandleLogic){
+		init(server, topic, group);
 		this.kafkaDataHandle = kafkaDataHandleLogic;
 	}
 
@@ -43,47 +43,36 @@ public class KafkaReceiverProcessor {
 	}
 
 
-
-
-	//TODO 配置放入配置文件
-	private void init(String topic) {
+	private void init(String server, String topic, String group) {
 		
-		Properties props = generateConsumerConfigProperty();
-		consumer = new KafkaConsumer<String, String>(
-				props);
+		Properties props = generateConsumerConfigProperty(server, group);
+		consumer = new KafkaConsumer(props);
 //		consumer.subscribe(Arrays.asList(topic));
 		consumer.assign( Arrays.asList(new TopicPartition(topic, 0)));
 		
 	}
 
-	private Properties generateConsumerConfigProperty() {
+	private Properties generateConsumerConfigProperty(String server, String group) {
 		Properties props = new Properties();
 		// kafka 集群地址设置
-		props.put("bootstrap.servers", "127.0.0.1");
+		props.put("bootstrap.servers", server);
 		// 订阅topic的用户组设置
 		// props.put("group.id", this.groupId);
-		props.put("group.id", "local_sync");
+		props.put("group.id", group);
 		props.put("max.poll.records", "10");
-
 		// 复位OFFSET, 断线重连时需用
 		props.put("auto.offset.reset", "earliest");
-
 		// 自动提交设置
 		props.put("enable.auto.commit", "false");
-
 		// 自动提交 offset 间隔时间
 		props.put("auto.commit.interval.ms", "3000");
-
 		props.put("heartbeat.interval.ms", "9000");
-
 		// session 连接超时时间
 //		props.put("session.timeout.ms",  30 * 1000);
 		props.put("fetch.max.wait.ms", 5 * 1000);
 //		props.put("request.timeout.ms",   35 * 1000);
-
 		// 最大大小为2M
 		props.put("max.partition.fetch.bytes", 2*1024*1024);
-
 		// key&value 反序列化设置
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");

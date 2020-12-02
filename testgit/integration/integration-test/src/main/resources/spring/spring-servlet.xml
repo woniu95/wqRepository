@@ -18,7 +18,7 @@
 
 
 	<!-- -Dscenic.local.callback.path=E:\知景区\scenic-local-root_szsjzc_20200417\scenic-local-callback-pom\scenic-local-callback-app\src\main\resources -->
-	<bean id="propertiesConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="propertiesConfig" class="com.wq.spring.PropertiesHolder">
         <property name="fileEncoding" value="UTF-8"/>
         <property name="ignoreResourceNotFound" value="true" />
         <property name="locations">
@@ -30,9 +30,9 @@
     </bean>
 
     <!--TODO 把配置文件属性注入自定义类  以便在程序中获取变量-->
-    <!--<bean id="moponPropertiesConfigLoad" class="com.mopon.component.properties.util.common.MoponPropertiesForFileLoad" lazy-init="false" depends-on="propertiesConfig" init-method="initializer">-->
-		<!--<property name="springProperties" ref="propertiesConfig"/>-->
-	<!--</bean>-->
+    <bean id="moponPropertiesConfigLoad" class="com.wq.spring.PropertyUtil" lazy-init="false" depends-on="propertiesConfig" init-method="initializer">
+		<property name="springProperties" ref="propertiesConfig"/>
+	</bean>
     
  	<bean id="log4jInitialization"
 		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
@@ -78,6 +78,6 @@
     <!--</mvc:annotation-driven>-->
 <!--MVC end-->
 
-	<import resource="spring-data-source-master.xml"/>
-	<import resource="spring-redis-config.xml"/>
+	<import resource="spring-data-db-config.xml"/>
+	<import resource="spring-data-config.xml"/>
 </beans>

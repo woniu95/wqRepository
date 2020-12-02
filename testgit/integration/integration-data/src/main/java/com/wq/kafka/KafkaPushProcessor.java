@@ -7,25 +7,24 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
-public class KafkaSenderProcessor {
+public class KafkaPushProcessor {
 
-	private Logger logger = LoggerFactory.getLogger(KafkaSenderProcessor.class);
+	private Logger logger = LoggerFactory.getLogger(KafkaPushProcessor.class);
 
 	private Producer<String, String> kafkaProducer;
 
-	public KafkaSenderProcessor(){
-		init();
+	public KafkaPushProcessor(String server, String group){
+		init(server, group);
 	}
 
-	//TODO 配置放入配置文件
-	public void init() {
+	public void init(String server, String group) {
 
 		Properties props = new Properties();
 		long begin = System.currentTimeMillis();
-		props.put("group.id", "local_sync");
+		props.put("group.id", group);
 		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1");
+		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
 		logger.info(" kafka sender processor init ... ");
 		kafkaProducer = new KafkaProducer(props);
 		logger.info(" kafka sender processor init complete, time: " + (System.currentTimeMillis() - begin));

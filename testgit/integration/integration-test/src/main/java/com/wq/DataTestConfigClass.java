@@ -1,16 +1,14 @@
 package com.wq;
 
-import com.mongodb.util.JSON;
 import com.wq.db.IDaoTest;
-import com.wq.kafka.IKafkaDataHandle;
-import com.wq.kafka.KafkaReceiverProcessor;
-import com.wq.kafka.KafkaSenderProcessor;
+import com.wq.kafka.KafkaPollProcessor;
+import com.wq.kafka.KafkaPushProcessor;
 import com.wq.mongodb.IMongodbDao;
 import com.wq.redis.RedisDataService;
+import com.wq.spring.PropertyUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -80,18 +78,17 @@ public class DataTestConfigClass {
 
     @Test
     public void kafkaTest(){
-
-        KafkaSenderProcessor senderProcessor = new KafkaSenderProcessor();
+        String server = PropertyUtil.getConfigVal("bootstrap.servers");
+        String group = PropertyUtil.getConfigVal("group.id");
+        KafkaPushProcessor senderProcessor = new KafkaPushProcessor(server, group);
         senderProcessor.send("kafkaTestData1", "kafkaTest");
 
-        KafkaReceiverProcessor kafkaReceiverProcessor = new KafkaReceiverProcessor("kafkaTest", new IKafkaDataHandle(){
-            @Override
-            public void doDataHandleLogic(String data) {
-                System.out.println("receive data: " + data);
-            }
+        KafkaPollProcessor kafkaPollProcessor = new KafkaPollProcessor(server,"kafkaTest",
+                group, data -> {
+            System.out.println("receive data: " + data);
         });
 
-        kafkaReceiverProcessor.pollData();
+        kafkaPollProcessor.pollData();
 
     }
 
