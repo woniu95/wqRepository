@@ -184,6 +184,37 @@
         </dependency>
 <!-- kafka end -->
 
+<!-- etcd   start -->
+
+        <!--v3 api 版本-->
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+            <version>0.5.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <!--v2 api 版本-->
+        <dependency>
+            <groupId>org.mousio</groupId>
+            <artifactId>etcd4j</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+<!-- etcd   end -->
+
+
+<!-- zookeeper start -->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.6.2</version>
+        </dependency>
+<!-- zookeeper end -->
+
 <!-- 日志start  slf4j 接口               logback 是实现  commons-logging 接口     桥接 - slf4j  -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -214,6 +245,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
         </dependency>
  <!-- json end -->
 

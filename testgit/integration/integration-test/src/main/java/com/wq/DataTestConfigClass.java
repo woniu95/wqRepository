@@ -14,8 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: testgit
@@ -36,9 +35,37 @@ public class DataTestConfigClass {
     @Resource
     IMongodbDao mongodbDao;
 
+    /**
+     *  history:
+     *      insert local single table(10*10000) ,test cost time:7017713 ms
+     * @throws Exception
+     */
     @Test
-    public void dbTest(){
-        System.out.println(daoTest.getData());
+    public void calCost() throws Exception {
+        Date start = new Date();
+        for(int i=0;i<10*10000;i++){
+            dbTest();
+        }
+        Date end = new Date();
+        System.out.println("test cost time:"+ (end.getTime()-start.getTime()));
+
+    }
+
+    @Test
+    public void dbTest() throws Exception {
+
+//        System.out.println(daoTest.getData());
+        List<String> columns = Arrays.asList("RECORD_NO", "MEMBER_RECORD_NO", "ORIGINAL_BEHAVIOR_RECORD_NO", "SEND_BY",
+                "REF_RECORD_NO", "SEND_STATUS", "STATUS_INFO", "CAN_SEND_COUPON_IDS", "CREATE_TIME");
+
+        List<List<Object>> rowList = new ArrayList<>();
+        List<Object> record = new ArrayList<>();
+        record.addAll(Arrays.asList(UUID.randomUUID().toString().replace("-",""),
+                "5f2d76116eee43f19bd598cdf3542c89", null, "ZD",
+                "41", "SUCCESS", null, "[144,128,141]", "2020-11-26 10:52:04"));
+        rowList.add(record);
+
+        daoTest.insertBatch( rowList,columns,"b_yx_coupon_send_prepare_info");
     }
 
     @Test
