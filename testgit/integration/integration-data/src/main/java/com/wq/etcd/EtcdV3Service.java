@@ -5,6 +5,7 @@ import io.etcd.jetcd.*;
 import io.etcd.jetcd.kv.DeleteResponse;
 import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.kv.PutResponse;
+import io.etcd.jetcd.options.WatchOption;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -59,11 +60,11 @@ public class EtcdV3Service {
         return !CollectionUtils.isEmpty(matchResults) ?  matchResults.get(0) : null;
     }
 
-    public void watch(String key, Consumer consumer){
+    public void watch(String key, WatchOption option, Consumer consumer){
 
         ByteSequence keySequence = ByteSequence.from(key.getBytes());
 
-        watchClient.watch(keySequence, consumer);
+        watchClient.watch(keySequence, option, consumer);
     }
 
     public List<KeyValue> delete(String key) throws ExecutionException, InterruptedException {
@@ -78,7 +79,10 @@ public class EtcdV3Service {
 
         EtcdV3Service etcdV3Service = new EtcdV3Service();
         etcdV3Service.initClient("http://localhost:2379");
-        etcdV3Service.watch("testKey", o -> System.out.println(JSON.toJSONString(o)));
+
+        etcdV3Service.watch("testKey", WatchOption.newBuilder().withNoPut(false).withNoDelete(true).build(),
+                o -> System.out.println(JSON.toJSONString(o)));
+
         etcdV3Service.put("testKey", "testValue");
         System.out.println(JSON.toJSONString(etcdV3Service.get("testKey")));
         System.out.println(JSON.toJSONString(etcdV3Service.delete("testKey")));
