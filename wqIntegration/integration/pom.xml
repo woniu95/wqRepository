@@ -37,11 +37,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>3.3.1</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
