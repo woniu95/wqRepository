@@ -19,6 +19,7 @@ public class MaxSubSequence {
 
         System.out.println("maxk: "+maxLengthUseBrute("123345", "138723"));
         System.out.println("maxk: "+getMaxKUseDP("123345", "13823"));
+
     }
 
 
@@ -70,12 +71,7 @@ public class MaxSubSequence {
                 }
             }
         }
-        for(int i=0,length=s1.length();i<length+1;i++){
-            for(int j=0,jlength=s2.length();j<jlength+1;j++){
-                System.out.print(dp[i][j]);
-            }
-            System.out.println();
-        }
+
         return k;
     }
 
