@@ -25,6 +25,8 @@ import java.lang.ref.*;
  * 设置线程栈的大小。
  * -XX:+HeapDumpOnOutOfMemory
  * 启用该选项，当出现java.lang.OutOfMemoryError异常时，Java的堆信息会dump到当前目录的文件中，文件命名为： java_pid[进程PID].hprof
+ *
+ *
  */
 public class ReferenceTest {
     public static void main(String[] args){
@@ -44,6 +46,8 @@ public class ReferenceTest {
         // 软引用
         // 当对象只被SoftReference 软引用指向时, 当内存不够，发生OutOfMemoryException之前会该对象堆空间释放，并把对应的弱引用放入指定的ReferenceQueue中.
         // 暂未测试出符合的结果
+        // 以上两种引用 通常用于 解决缓存OOM 问题， 常见方式： Map<key, SoftReference>   SoftReference<CacheItem>
+        // 通过ReferenceQueue<SoftReference> 清除SoftReference无效引用（map中的）
         SoftReference soft = new SoftReference(softObj, refQueue1);
 
         weakObj = null;
