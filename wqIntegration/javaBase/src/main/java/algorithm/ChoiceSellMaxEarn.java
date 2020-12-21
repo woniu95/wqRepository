@@ -34,6 +34,7 @@ public class ChoiceSellMaxEarn {
     }
 
     /**
+     * dp 问题关键： 是找到一个自己想的通的且正确的 dp 结构和含义
      * 是否持有
      *      是 无法买入，可以卖出
      *      否 可以买入，不能卖出
@@ -87,4 +88,5 @@ public class ChoiceSellMaxEarn {
         }
         return Math.max( Math.max(sellMaxEarn, buyMaxEarn), noMaxEarn);
     }
+
 }
