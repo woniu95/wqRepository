@@ -30,7 +30,7 @@
     </bean>
 
     <!--TODO 把配置文件属性注入自定义类  以便在程序中获取变量-->
-    <bean id="moponPropertiesConfigLoad" class="com.wq.spring.PropertyUtil" lazy-init="false" depends-on="propertiesConfig" init-method="initializer">
+    <bean id="propertyUtil" class="com.wq.spring.PropertyUtil" lazy-init="false" depends-on="propertiesConfig" init-method="initializer">
 		<property name="springProperties" ref="propertiesConfig"/>
 	</bean>
     
