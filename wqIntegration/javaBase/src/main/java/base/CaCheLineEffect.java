@@ -30,27 +30,30 @@ public class CaCheLineEffect {
                 arr[i][j] = i;
             }
         }
-        System.out.println("successive data access ");
+
+        System.out.println("not successive data access ");
         long startTime = System.currentTimeMillis();
+
+        for(int j = 0;j<8;j++){
+            for(int i=0; i<1024*1024; i++){
+                sum = sum.add(BigInteger.valueOf(arr[i][j]));
+                long c = arr[i][j];
+            }
+        }
+        System.out.println("cost time :"+(System.currentTimeMillis()-startTime)+" ms, result is"+sum );
+
+        sum = BigInteger.ZERO;
+        System.out.println("successive data access ");
+        startTime = System.currentTimeMillis();
         for(int i=0; i<1024*1024; i++){
             for(int j = 0;j<8;j++){
-                //sum = sum.add(BigInteger.valueOf(arr[i][j]));
+                sum = sum.add(BigInteger.valueOf(arr[i][j]));
                 long c = arr[i][j];
             }
         }
         System.out.println("cost time :"+(System.currentTimeMillis()-startTime)+" ms, result is:"+sum );
 
-        sum = BigInteger.ZERO;
 
-        System.out.println("not successive data access ");
-        startTime = System.currentTimeMillis();
-        for(int j = 0;j<8;j++){
-            for(int i=0; i<1024*1024; i++){
-                // sum = sum.add(BigInteger.valueOf(arr[i][j]));
-               long c = arr[i][j];
-            }
-        }
-        System.out.println("cost time :"+(System.currentTimeMillis()-startTime)+" ms, result is"+sum );
 
     }
 
