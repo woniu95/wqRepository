@@ -23,7 +23,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.17.RELEASE</spring.version>
+        <spring.version>4.3.29.RELEASE</spring.version>
         <integration.version>1.0.0</integration.version>
 
         <redis.version>2.6.1</redis.version>
