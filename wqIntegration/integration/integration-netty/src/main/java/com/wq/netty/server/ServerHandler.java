@@ -13,6 +13,9 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author wq
+ */
 @ChannelHandler.Sharable
 public class ServerHandler extends SimpleChannelInboundHandler<RequestProto.ReqProtocol> {
 
