@@ -15,12 +15,12 @@
     <dependencies>
         <dependency>
             <artifactId>integration-data</artifactId>
-            <groupId>groupId</groupId>
+            <groupId>wq</groupId>
             <version>${integration.version}</version>
         </dependency>
         <dependency>
             <artifactId>integration-util</artifactId>
-            <groupId>groupId</groupId>
+            <groupId>wq</groupId>
             <version>${integration.version}</version>
         </dependency>
     </dependencies>

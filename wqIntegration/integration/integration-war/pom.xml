@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <artifactId>integration-service</artifactId>
-            <groupId>groupId</groupId>
+            <groupId>wq</groupId>
             <version>${integration.version}</version>
         </dependency>
 
