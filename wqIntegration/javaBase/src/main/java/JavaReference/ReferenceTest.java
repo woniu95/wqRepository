@@ -63,24 +63,20 @@ public class ReferenceTest {
             }
         }).start();
 
+        Reference phantom = getReference(10, "PHANTOM", phantomRefQuene);
+        Reference soft = getReference(20, "SOFT", softRefQueue);
         getReference(10, "WEAK", weakRefQueue);
-        getReference(10, "SOFT", softRefQueue);
-        getReference(10, "PHANTOM", phantomRefQuene);
 
         //申请内存使OutOfMemoryError
         byte[] requstMemory;
         try{
-            System.out.println("Current memory total: "+ Runtime.getRuntime().totalMemory()/1024/8);
+            System.out.println("Current freeMemory : "+ Runtime.getRuntime().freeMemory()/1024/1024);
 
-            System.out.println("Allocate new byte[1024*60] after 5 second");
             TimeUnit.SECONDS.sleep(5);
-            int freeMemory = (int) Runtime.getRuntime().freeMemory();
-            requstMemory = new byte[freeMemory+100];
-            System.out.println("new byte["+freeMemory+100+"]");
-            System.out.println("Current memory total: "+ Runtime.getRuntime().totalMemory()/1024/8);
 
-            System.out.println("fill in all byte[1024*60]");
-            System.out.println("Current memory total: "+ Runtime.getRuntime().totalMemory()/1024/8);
+            requstMemory = new byte[20*1024*1024];
+
+            System.out.println("Current freeMemory: "+ Runtime.getRuntime().freeMemory()/1024/1024);
         }catch (OutOfMemoryError e){
             e.printStackTrace();
         }
@@ -110,7 +106,8 @@ public class ReferenceTest {
                 referent.setAccessible(true);
                 Object result = referent.get(ref);
 
-                System.out.println("==============>reference:" + ref.getClass() + "@" + ref.hashCode());
+                System.out.println("==============>reference:" + ref.getClass() + "@" + ref.hashCode()
+                        +" freeMemory:"+Runtime.getRuntime().freeMemory()/1024/1024+" M");
                 if(result == null){
                     System.out.println("==============>referent: has bean null, gc will collect:");
                 }else{
@@ -132,7 +129,8 @@ public class ReferenceTest {
      */
     static Reference getReference(int size, String type, ReferenceQueue referenceQueue) throws InterruptedException {
 
-        System.out.println("getReference size: "+size+", type:" + type);
+        System.out.println("==============>getReference size: "+size+", type:" + type+" now freeMemory:"
+                +Runtime.getRuntime().freeMemory()/1024/1024+" M");
         //用reference 保持对refMemory对应类型的引用
         // 如果直接new *Reference(refMemory, referenceQueue) ,会使refMemory无引用指向, 直接变成不可达, 被GC直接回收，
         // 不会放入referenceQueue中
@@ -150,12 +148,11 @@ public class ReferenceTest {
         }
         //清除强引用
         refMemory = null;
-        System.out.println("==============>sleep 3 second before System.gc()");
-        TimeUnit.SECONDS.sleep(3);
-        System.gc();
-        System.out.println("==============>called System.gc()");
-        System.out.println();
-        System.out.println();
+//        TimeUnit.SECONDS.sleep(3);
+//        System.gc();
+//        System.out.println("==============>type :"+type+" called System.gc()");
+//        System.out.println();
+//        System.out.println();
         return reference;
     }
 }
