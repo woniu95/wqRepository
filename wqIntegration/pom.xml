@@ -23,6 +23,7 @@
         <module>javaBase</module>
         <module>integration</module>
         <module>cloudIntegration</module>
+        <module>integration-springboot</module>
     </modules>
 
 </project>
