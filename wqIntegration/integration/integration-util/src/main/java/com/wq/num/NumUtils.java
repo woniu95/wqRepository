@@ -1,5 +1,6 @@
 package com.wq.num;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 /**
@@ -83,6 +84,26 @@ public class NumUtils {
             inRange = true;
         }
         return inRange;
+    }
+
+
+    /**
+     * 生成 随机值
+     * @param low
+     * @param up
+     * @return
+     */
+    public static BigDecimal randomBigDecimal(BigDecimal low, BigDecimal up){
+
+        //生成随机数
+        BigDecimal db = new BigDecimal(Math.random() * (up.subtract(low).doubleValue())).add(low);
+
+        //返回保留两位小数的随机数。不进行四舍五入
+        BigDecimal result = db.setScale(up.scale(), BigDecimal.ROUND_DOWN);
+        if(BigDecimal.ZERO.compareTo(result) == 0){
+            result = db.setScale(up.scale()+1, BigDecimal.ROUND_DOWN);
+        }
+        return result;
     }
 
     public static void main(String[] args) {

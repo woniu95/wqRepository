@@ -103,6 +103,7 @@ public class TestActivity {
                 if(this.newPoolLave.intValue() >= this.newCutMax){
                     cutPrice = new BigDecimal(NumUtils.getRandomNotContains(this.newCutLeast, this.newCutMax));
                 }else{
+
                     cutPrice = randomBigDecimal(new BigDecimal(0), this.newPoolLave);
                 }
                 this.newPoolLave = this.newPoolLave.subtract(cutPrice);
@@ -133,20 +134,13 @@ public class TestActivity {
      */
     public static BigDecimal randomBigDecimal(BigDecimal low, BigDecimal up){
 
-        double minF = low.doubleValue();
-        double maxF = up.doubleValue();
-
         //生成随机数
-        BigDecimal db = new BigDecimal(Math.random() * (up.subtract(low).doubleValue())).add(low);
+        BigDecimal db =  NumUtils.randomBigDecimal(low, up);
         if(checkReRandom(db, low, up)){
-            db = new BigDecimal(Math.random() * (db.subtract(low).doubleValue())).add(low);
+            db = NumUtils.randomBigDecimal(low, db);
         }
-        //返回保留两位小数的随机数。不进行四舍五入
-        BigDecimal result = db.setScale(up.scale(), BigDecimal.ROUND_DOWN);
-        if(BigDecimal.ZERO.compareTo(result) == 0){
-            result = db.setScale(up.scale()+1, BigDecimal.ROUND_DOWN);
-        }
-        return result;
+
+        return db;
     }
 
     public static boolean checkReRandom(BigDecimal cutPrice, BigDecimal low, BigDecimal up){
