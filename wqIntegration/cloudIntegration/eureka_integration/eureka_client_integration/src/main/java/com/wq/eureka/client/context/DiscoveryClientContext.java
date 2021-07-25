@@ -5,6 +5,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -19,10 +20,11 @@ public class DiscoveryClientContext {
     @Autowired
     private DiscoveryClient discoveryClient;
 
-    public String serviceUrl() {
-        List<ServiceInstance> list = discoveryClient.getInstances("STORES");
-        if (list != null && list.size() > 0 ) {
-            return list.get(0).getUri().getRawPath();
+    public URI serviceUrl() {
+        List<String> services = discoveryClient.getServices();
+        List<ServiceInstance> list = discoveryClient.getInstances(services.get(0));
+        if (list != null && list.size() > 0) {
+            return list.get(0).getUri();
         }
         return null;
     }

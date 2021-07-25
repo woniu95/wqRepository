@@ -8,8 +8,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
-#    healthcheck:
-#      enabled: true
+  #    healthcheck:
+  #      enabled: true
   instance:
     statusPageUrlPath: ${server.servletPath}/info
     healthCheckUrlPath: ${server.servletPath}/health

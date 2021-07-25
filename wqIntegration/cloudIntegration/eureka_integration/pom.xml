@@ -15,6 +15,7 @@
         <module>eureka_client_integration</module>
         <module>eureka_server_integration</module>
         <module>eureka_integration_test</module>
+        <module>eureka_feign_integration</module>
     </modules>
 
 
