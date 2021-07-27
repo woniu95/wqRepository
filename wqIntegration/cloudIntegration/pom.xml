@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>config_center_integration</module>
-        <module>eureka_integration</module>
+        <module>spring_cloud_integration</module>
         <module>log_integration</module>
     </modules>
 
