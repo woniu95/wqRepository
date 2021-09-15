@@ -1,7 +1,23 @@
 package leetcode;
 
 /**
+ *           0, 1
+ *      dh  -1  0  1
+ * (0,1)
+ * (1,2)
+ * (2,3)
+ * (3,3)
+ * (4,6)
+ * (5,1)
  *
+ *
+ *  for (int i = 0; i < m; i++) {
+ *       while (!stk.empty() && left[stk.top()][j] >= left[i][j]) {
+ *             stk.pop();
+ *       }
+ *       up[i] = stk.empty() ? -1 : stk.top();
+ *       stk.push(i);
+ * }
  *
  * j\i
  * --------------------------
@@ -66,6 +82,25 @@ public class MaxMatrix {
         }
         return tem;
     }
+
+    public static  int getMaxMatix(char[][] arr){
+        int[][] dp = new int[arr.length][arr[0].length];
+        for(int i=0;i<arr.length;i++){
+            for(int j=0;j<arr[0].length;j++){
+                if(arr[i][j] == '1'){
+                    dp[i][j]= j-1>0 ? dp[i][j-1]+1 : 1;
+                }else{
+                    dp[i][j] = 0;
+                }
+            }
+        }
+        for(int j=0;j<arr[0].length;j++){
+            for(int i=0;j<arr.length;i++){
+
+            }
+        }
+        return 0;
+    }
     public static int getMaxMatrixUseBrutePro(char[][] arr){
         int max = 0;
 
@@ -74,25 +109,19 @@ public class MaxMatrix {
                 if(arr[i][j] == '0'){
                     continue;
                 }
-                int[][] dp = new int[arr.length][arr[0].length];
-                for(int r=i;r<rowLength;r++){
-                    for(int c=j;c<colLength;c++){
+                int rEnd=rowLength;
+                int cEnd = colLength;
+                for(int r=i;r<rEnd;r++){
+                    for(int c=j;c<cEnd;c++){
                         if(arr[r][c] == '0'){
-                            dp[r][c] = 0;
-                        }else if((r-1>=i && c-1>=j) && (dp[r][c-1] == 0 || dp[r-1][c] == 0)){
-                            dp[r][c] = 0;
-                        }else if(r==i && c-1>=j && dp[r][c-1] == 0){
-                            dp[r][c] = 0;
-                        }else if(r-1>=i && c==j && dp[r-1][c] == 0){
-                            dp[r][c] = 0;
-                        }else{
-                            dp[r][c] = (r+1-i)*(c+1-j);
-                            max = Math.max(dp[r][c], max);
-                        }
-                        if(dp[r][c] == 0){
+                            if(c==j){
+                                rEnd = r;
+                            }
+                            cEnd = c;
                             break;
+                        }else{
+                            max = Math.max((r+1-i)*(c+1-j), max);
                         }
-
                     }
                 }
             }
