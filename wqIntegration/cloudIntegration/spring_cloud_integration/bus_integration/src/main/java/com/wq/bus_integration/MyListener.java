@@ -1,6 +1,7 @@
 package com.wq.bus_integration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
@@ -20,6 +21,7 @@ public class MyListener {
 
     @EventListener
     public void onCustomRemoteApplicationEvent(MyEvent event) {
+
         System.out.printf("MyEvent - port : %s , Source : %s , originService : %s , destinationService : %s \n",
                 port, event.getSource(), event.getOriginService(), event.getDestinationService());
     }

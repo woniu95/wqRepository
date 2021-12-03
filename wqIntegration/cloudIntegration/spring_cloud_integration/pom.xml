@@ -19,6 +19,7 @@
         <module>eureka_feign_integration</module>
         <module>resilience4J_integration</module>
         <module>bus_integration</module>
+        <module>openfeign_integration</module>
     </modules>
 
 
