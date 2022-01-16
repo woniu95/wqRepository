@@ -1,13 +1,10 @@
-package com.wq.db;
+package com.wq;
 
 import com.wq.collection.CollectionUtils;
-import com.wq.reflect.BeanUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DatabaseUtil {
 

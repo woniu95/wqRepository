@@ -22,5 +22,11 @@
             <!--<artifactId>proxool_cglib</artifactId>-->
             <!--<version>0.9.1</version>-->
         <!--</dependency>-->
+        <dependency>
+            <groupId>wq</groupId>
+            <artifactId>integration-util</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
