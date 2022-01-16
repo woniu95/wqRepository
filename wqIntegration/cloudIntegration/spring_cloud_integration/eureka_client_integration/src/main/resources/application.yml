@@ -1,0 +1,38 @@
+server:
+  servletPath: /
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    # 设置服务消费者从注册中心拉取服务列表的间隔
+    registry-fetch-interval-seconds: 30
+  instance:
+    statusPageUrlPath: ${server.servletPath}/info
+    healthCheckUrlPath: ${server.servletPath}/health
+#    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+    #服务续约任务的调用间隔时间，默认为30秒
+    lease-renewal-interval-in-seconds: 60
+logging:
+  config: classpath:log4j2.xml
+
+spring:
+  application:
+    name: eureka-client-integration
+
+---
+server:
+  port: 8081
+spring:
+  config:
+    activate:
+      on-profile: client1
+---
+server:
+  port: 8082
+spring:
+  config:
+    activate:
+      on-profile: client2
+

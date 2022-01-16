@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: eureka_client_integration
+
+server:
+  servletPath: /
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  #    healthcheck:
+  #      enabled: true
+  instance:
+    statusPageUrlPath: ${server.servletPath}/info
+    healthCheckUrlPath: ${server.servletPath}/health
+    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
