@@ -24,6 +24,7 @@
         <module>integration</module>
         <module>cloudIntegration</module>
         <module>integration-springboot</module>
+        <module>integration-pulsar</module>
     </modules>
 
 </project>
