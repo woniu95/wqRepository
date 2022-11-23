@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
-            <version>5.3.0</version>
+            <version>5.3.1</version>
         </dependency>
         <!-- log4j2日志依赖 -->
         <dependency>
