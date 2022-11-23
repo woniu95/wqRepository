@@ -20,7 +20,7 @@
         <!--pulsar start -->
         <dependency>
             <groupId>org.apache.pulsar</groupId>
-            <artifactId>pulsar-client</artifactId>
+            <artifactId>pulsar-client-all</artifactId>
             <version>2.10.2</version>
         </dependency>
         <!--pulsar end -->
