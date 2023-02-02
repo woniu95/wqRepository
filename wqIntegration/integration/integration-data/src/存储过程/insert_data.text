@@ -1,0 +1,32 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertData`(IN `count` bigint)
+BEGIN
+	#Routine body goes here...
+	 #定义一个初始变量
+     declare i int;
+     declare _desc varchar(255) default '';
+     declare _code varchar(64)  default '';
+	 //提高效率，取消自动提交
+	 set autocommit = 0;
+
+     #设置变量值为1
+
+     Set i=1;
+
+     #此处的i值可以根据需要调整为1000、10000、100000等数量级。
+
+     While i<=count do
+
+              #mysql的连接函数
+
+              Set _desc=random_str(255);
+
+              Set _code= 1380000000+i;
+
+              Insert into test(`code`, `desc`) values(_code, _desc);
+
+              Set i=i+1;
+
+     End while;
+
+		 set autocommit = 1;
+END

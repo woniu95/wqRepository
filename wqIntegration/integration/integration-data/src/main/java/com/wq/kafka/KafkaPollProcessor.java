@@ -47,8 +47,8 @@ public class KafkaPollProcessor {
 		
 		Properties props = generateConsumerConfigProperty(server, group);
 		consumer = new KafkaConsumer(props);
-//		consumer.subscribe(Arrays.asList(topic));
-		consumer.assign( Arrays.asList(new TopicPartition(topic, 0)));
+		consumer.subscribe(Arrays.asList(topic));
+//		consumer.assign( Arrays.asList(new TopicPartition(topic, 0)));
 		
 	}
 
