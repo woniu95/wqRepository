@@ -19,6 +19,8 @@
         <module>integration-util</module>
         <module>integration-test</module>
         <module>integration-netty</module>
+        <module>integration-pulsar</module>
+
     </modules>
 
     <properties>
@@ -180,7 +182,8 @@
         </dependency>
 <!-- kafka end -->
 
-<!-- etcd   start -->
+
+        <!-- etcd   start -->
 
         <!--v3 api 版本-->
         <dependency>
