@@ -47,6 +47,17 @@ public class DatabaseUtil {
         return humpNames;
     }
 
+
+    public static String insertSql(Connection connection, String tableName){
+
+
+        StringBuilder sb = new StringBuilder("INSERT INTO ");
+        sb.append(tableName).append("(")
+                .append(columnName(connection, tableName)).append(")").append("\n")
+                .append("values ( ").append(mybatisParamColumnName(connection, tableName, "v")).append(" )");
+        return sb.toString();
+    }
+
     public static String insertSql(Connection connection, String tableName, String replacePrefix, String str){
 
         String sqlTableName = tableName.replaceFirst(replacePrefix, str);
@@ -55,6 +66,13 @@ public class DatabaseUtil {
         sb.append(sqlTableName).append("(")
                 .append(columnName(connection, tableName)).append(")").append("\n")
                 .append("values ( ").append(mybatisParamColumnName(connection, tableName, "v")).append(" )");
+        return sb.toString();
+    }
+
+    public static String selectSql(Connection connection, String tableName){
+
+        StringBuilder sb = new StringBuilder("SELECT ");
+        sb.append(columnHumpName(connection, tableName)).append("\n").append("FROM ").append(tableName);
         return sb.toString();
     }
 
@@ -260,13 +278,13 @@ public class DatabaseUtil {
         Connection connection2 = null;
         try{
             DatabaseUtil.DataSource dataSource1 = new DatabaseUtil.DataSource
-                    ("jdbc:mysql://127.0.0.1:3306/toc-order?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=GMT%2B8",
+                    ("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=GMT%2B8",
                             "root", "123456");
 //            DatabaseUtil.DataSource dataSource2 = new DatabaseUtil.DataSource
 //                    ("jdbc:mysql://192.168.9.130:3306/merchant-dev?characterEncoding=UTF-8&UseAffectedRows=1","merchant", "mopon123");
             connection1 =  DatabaseUtil.getConnection(dataSource1);
 
-            String sql = DatabaseUtil.insertSql(connection1, "xx_trade_isv_order", "xx", "\\$\\{tenantCode\\}");
+            String sql = DatabaseUtil.insertSql(connection1, "resource");
 
             System.out.println(sql);
 

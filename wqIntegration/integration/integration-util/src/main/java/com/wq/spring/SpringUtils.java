@@ -4,6 +4,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
@@ -38,6 +39,35 @@ public class SpringUtils implements ApplicationContextAware {
         //获取到该方法的参数们
         String[] params = u.getParameterNames(method);
         return Arrays.asList(params);
+    }
+
+    /**
+     * 获取对象上指定接口 泛型实际类型
+     * @param instance
+     * @param targetClass
+     * @return
+     */
+    public Class getReferenceClass(Object instance, Class targetClass){
+        ResolvableType t = ResolvableType.forInstance(instance);
+        for(ResolvableType resolvableType: t.getInterfaces()){
+            Class rawClass = resolvableType.getRawClass();
+            if(rawClass.equals(targetClass)){
+                ResolvableType[] resolvableTypes = resolvableType.getGenerics();
+                for (ResolvableType type : resolvableTypes) {
+                    //todo
+//
+//                    Class rawClass1 = type.getRawClass();
+//                    if(rawClass1.equals(List.class)){
+//                        ResolvableType[] resolvableTypes1 = type.getGenerics();
+//                        isCollection = true;
+//                        msgClass = resolvableTypes1[0].resolve();
+//                    }else{
+//                        msgClass = rawClass1;
+//                    }
+                }
+            }
+        }
+        return null;
     }
 
 }
