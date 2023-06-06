@@ -17,9 +17,12 @@ import org.junit.runners.Parameterized;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wangqiang
@@ -30,7 +33,9 @@ public class WqPulsar {
     public static final String adminUrl = "http://192.168.100.26:18080/";
     public static  final Properties clientConfig = new Properties();
     static {
-        clientConfig.put("serviceUrl", "pulsar://192.168.100.26:6650");
+//        clientConfig.put("serviceUrl", "pulsar://192.168.100.26:6650");
+        clientConfig.put("serviceUrl", "pulsar://localhost:6650");
+
     }
 
 
@@ -41,8 +46,7 @@ public class WqPulsar {
         auth.configure("{\"userId\":\"superuser\",\"password\":\"admin\"}");
         PulsarClient client = PulsarClient.builder()
                 .serviceUrl(properties.getProperty("serviceUrl"))
-                .authentication(
-                        auth)
+//                .authentication(auth)
                 .build();
         return client;
 
@@ -133,18 +137,46 @@ public class WqPulsar {
      */
     @Test
     public void sendMsgTest() throws PulsarClientException {
-        String topic = "persistent://public/default/consumerPullEarliestPositionTestTopic";
+        String topic = "persistent://public/default/consumerPullEarliestPositionTestTopic5";
         PulsarClient pulsarClient = getClient(clientConfig);
         Producer producer = pulsarClient.newProducer(Schema.STRING).producerName(topic+"-Producer").
                 topic(topic).create();
+        Producer producer2 = pulsarClient.newProducer(Schema.STRING).producerName(topic+"-Producer2").
+                topic(topic).create();
+        Long topstart = System.currentTimeMillis();
+        ExecutorService executor = Executors.newFixedThreadPool(100);
+        AtomicLong c = new AtomicLong(0);
+        List<Future> futures = new ArrayList<>(100);
+        for(int i=0;i<300;i++){
+            futures.add(executor.submit(()->{
+                Long start = System.currentTimeMillis();
 
-        for(int i=0;i<10;i++){
-            String msg = "msg-"+System.currentTimeMillis();
+                while(System.currentTimeMillis()-start<1000){
+                    String msg = "msg-"+c.addAndGet(2);
 
-            MessageId msID = producer.send(msg);
-            System.out.println(String.format("topic: %s , send msg id: %s, msg data: %s", topic, msID.toString(), msg));
-
+                    try {
+                        MessageId msID = producer.send(msg);
+                        producer2.send(msg);
+                    } catch (PulsarClientException e) {
+                        e.printStackTrace();
+                    }
+                }
+//                System.out.println(String.format("count:%s, cost: %s ms", count, System.currentTimeMillis()-start));
+            }));
         }
+        futures.forEach(future -> {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+        System.out.println(String.format("total count:%s", c.get(), System.currentTimeMillis()-topstart));
+
+
+
     }
 
     /**
@@ -152,30 +184,44 @@ public class WqPulsar {
      */
     public static void consumerPullPositionTest() throws PulsarClientException {
         PulsarClient pulsarClient = getClient(clientConfig);
-        pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullEarliestPositionTestTopic").
-                consumerName("consumerPullEarliestPositionTestConsumer").
+       Consumer c1 =  pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullEarliestPositionTestTopic5").
+                consumerName("consumerPullEarliestPositionTestConsumer2").
                 subscriptionName("consumerPullEarliestPositionTestSubscription").
-                subscriptionInitialPosition(SubscriptionInitialPosition.Earliest).messageListener((consumer, msg) -> {
-                    try {
-                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
-                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
-                    } catch (PulsarClientException e) {
-                        e.printStackTrace();
-                    }
-                }).subscribe();
-
-        pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullLatestPositionTestTopic").
-                consumerName("consumerPullLatestPositionTestConsumer").
+//                subscriptionInitialPosition(SubscriptionInitialPosition.Earliest).messageListener((consumer, msg) -> {
+//                    try {
+//                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+//                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+//                        consumer.acknowledge(msg);
+//                        int a = 1/0;
+//                    } catch (PulsarClientException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }).
+                subscribe();
+        consume(c1);
+        Consumer c2 =   pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullEarliestPositionTestTopic5").
+                consumerName("consumerPullLatestPositionTestConsumer2").
                 subscriptionName("consumerPullLatestPositionTestSubscription").
-                subscriptionInitialPosition(SubscriptionInitialPosition.Latest).messageListener((consumer, msg) -> {
-                    try {
-                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
-                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
-                    } catch (PulsarClientException e) {
-                        e.printStackTrace();
-                    }
-                }).subscribe();
+//                subscriptionInitialPosition(SubscriptionInitialPosition.Latest).messageListener((consumer, msg) -> {
+//                    try {
+//                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+//                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+//                        consumer.acknowledge(msg);
+//                        int a = 1/0;
+//                    } catch (PulsarClientException e) {
+//                        e.printStackTrace();
+//                    }
+//                }).
+                subscribe();
+         consume(c2);
+    }
 
+    private static void consume(Consumer c1) throws PulsarClientException {
+        Message msg = c1.receive();
+        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+                                msg.getTopicName(), c1.getConsumerName(), c1.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+        c1.acknowledge(msg);
     }
 
     /**

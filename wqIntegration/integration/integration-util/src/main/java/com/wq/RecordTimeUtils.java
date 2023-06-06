@@ -2,6 +2,11 @@ package com.wq;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @PackageName:com.wq
@@ -47,6 +52,22 @@ public class RecordTimeUtils {
         }finally {
             timers.remove();
         }
+    }
+
+    public static void doPointTimes(Integer times, Runnable runnable, String desc){
+        System.out.println("================================ doPointTimes start ================================================");
+        RecordTimeUtils totalUtils = new RecordTimeUtils();
+        totalUtils.varstart();
+
+        for(int i=0;i<times;i++){
+            RecordTimeUtils timeUtils = new RecordTimeUtils();
+
+            timeUtils.varstart();
+            runnable.run();
+            System.out.println(desc+" do once cost time :" +timeUtils.varend());
+        }
+        System.out.println(desc+" do "+times+ " total cost time :" +totalUtils.varend());
+        System.out.println("================================= doPointTimes end ===============================================");
     }
 
 

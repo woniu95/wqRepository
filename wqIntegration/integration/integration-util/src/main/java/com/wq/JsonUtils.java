@@ -1,6 +1,7 @@
 package com.wq;
 
 import com.alibaba.fastjson.JSON;
+import org.checkerframework.checker.units.qual.A;
 import org.codehaus.jackson.type.TypeReference;
 import com.github.pagehelper.Page;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
@@ -30,40 +31,40 @@ public class JsonUtils {
         System.out.println(objectMapper.writeValueAsString(p));
         System.out.println( JSON.toJSON(p));
 
-        RecordTimeUtils timeUtils = new RecordTimeUtils();
-        timeUtils.varstart();
-        for(int i=0, count =100;i<count;i++){
-            List<A> listB = getTestData(20000);
-            RecordTimeUtils.start();
-            String s = JSON.toJSONString(listB);
+        List<A> listA = getTestData(4000);
+
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, A.class);
+
+        RecordTimeUtils.doPointTimes(100, ()->{
+            try{
+                String s = objectMapper.writeValueAsString(listA);
+                List<A> a = objectMapper.readValue(s, javaType);
+            }catch (Exception e){
+
+            }
+        }, "Jackson JavaType");
+
+        TypeReference typeReference = new TypeReference<List<A>>(){};
+
+        RecordTimeUtils.doPointTimes(100, ()->{
+            try{
+                String s = objectMapper.writeValueAsString(listA);
+                List<A> a = objectMapper.readValue(s, typeReference);
+            }catch (Exception e){
+
+            }
+        }, "Jackson TypeReference");
+
+
+        RecordTimeUtils.doPointTimes(100, ()->{
+            String s = JSON.toJSONString(listA);
             List<A> a = JSON.parseArray(s, A.class);
-            System.out.println("Fastjson consume time :" +RecordTimeUtils.end());
-        }
-        System.out.println("Fastjson Total consume time :" +timeUtils.varend());
+        }, "Fastjson");
+
 
         System.out.println("================================================================================");
 
-        timeUtils.varstart();
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, A.class);
-        for(int i=0, count =100;i<count;i++){
-            List<A> listA = getTestData(20000);
-            RecordTimeUtils.start();
-            String s = objectMapper.writeValueAsString(listA);
-            List<A> a = objectMapper.readValue(s, javaType);
-            System.out.println("Jackson JavaType consume time :" +RecordTimeUtils.end());
-        }
-        System.out.println("Jackson JavaType Total consume time :" +timeUtils.varend());
 
-        timeUtils.varstart();
-        TypeReference typeReference = new TypeReference<List<A>>(){};
-        for(int i=0, count =100;i<count;i++){
-            List<A> listA = getTestData(20000);
-            RecordTimeUtils.start();
-            String s = objectMapper.writeValueAsString(listA);
-            List<A> a = objectMapper.readValue(s, typeReference);
-            System.out.println("Jackson TypeReference consume time :" +RecordTimeUtils.end());
-        }
-        System.out.println("Jackson TypeReference  Total consume time :" +timeUtils.varend());
 
     }
 

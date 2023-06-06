@@ -25,11 +25,22 @@ public class ThreadUtils {
         return threadPoolExecutor;
     }
 
-    public static void runInConcurrent(List<ConcurrentJob> concurrentJobs, ThreadPoolExecutor threadPoolExecutor){
-        CountDownLatch countDownLatch = new CountDownLatch(concurrentJobs.size());
-        for (ConcurrentJob concurrentJob : concurrentJobs){
-            concurrentJob.setCountDownLatch(countDownLatch);
-            threadPoolExecutor.submit(concurrentJob);
+
+    public static void doMultiThread(Runnable runnable, Integer threadCount, String desc){
+        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadCount, threadCount, 0, null, workQueue);
+        for(int i=0;i<threadCount;i++){
+            threadPoolExecutor.submit(runnable);
+        }
+    }
+
+    public static void runInConcurrent(List<Runnable> concurrentJobs){
+        int concurrentSize = concurrentJobs.size();
+        CountDownLatch countDownLatch = new CountDownLatch(concurrentSize);
+
+        ThreadPoolExecutor fixedPool = new ThreadPoolExecutor(concurrentSize, concurrentSize, 0 , null, null);
+        for (Runnable concurrentJob : concurrentJobs){
+            fixedPool.submit(new ConcurrentJob(concurrentJob, countDownLatch));
         }
     }
 
@@ -37,14 +48,11 @@ public class ThreadUtils {
 
         private  CountDownLatch countDownLatch;
 
-        private ConcurrentTask concurrentTask;
+        private Runnable runnable;
 
-        public ConcurrentJob(ConcurrentTask concurrentTask) {
-            this.concurrentTask = concurrentTask;
-        }
-
-        public void setCountDownLatch(final CountDownLatch countDownLatch){
+        public ConcurrentJob(Runnable runnable, CountDownLatch countDownLatch) {
             this.countDownLatch = countDownLatch;
+            this.runnable = runnable;
         }
 
         @Override
@@ -53,7 +61,7 @@ public class ThreadUtils {
             try {
                 countDownLatch.countDown();
                 countDownLatch.await();
-                concurrentTask.execute();
+                runnable.run();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -61,7 +69,4 @@ public class ThreadUtils {
         }
     }
 
-    public  interface ConcurrentTask{
-        void execute();
-    }
 }
