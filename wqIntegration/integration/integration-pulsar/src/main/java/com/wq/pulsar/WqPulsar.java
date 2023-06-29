@@ -2,6 +2,7 @@ package com.wq.pulsar;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.client.admin.PulsarAdmin;
 import org.apache.pulsar.client.admin.PulsarAdminBuilder;
 import org.apache.pulsar.client.admin.PulsarAdminException;
@@ -33,8 +34,8 @@ public class WqPulsar {
     public static final String adminUrl = "http://192.168.100.26:18080/";
     public static  final Properties clientConfig = new Properties();
     static {
-//        clientConfig.put("serviceUrl", "pulsar://192.168.100.26:6650");
-        clientConfig.put("serviceUrl", "pulsar://localhost:6650");
+        clientConfig.put("serviceUrl", "pulsar://192.168.100.26:6650");
+//        clientConfig.put("serviceUrl", "pulsar://localhost:6650");
 
     }
 
@@ -46,7 +47,7 @@ public class WqPulsar {
         auth.configure("{\"userId\":\"superuser\",\"password\":\"admin\"}");
         PulsarClient client = PulsarClient.builder()
                 .serviceUrl(properties.getProperty("serviceUrl"))
-//                .authentication(auth)
+                .authentication(auth)
                 .build();
         return client;
 
@@ -133,10 +134,10 @@ public class WqPulsar {
 
 
     /**
-     * 发送消息
+     * 发送大量消息测试
      */
     @Test
-    public void sendMsgTest() throws PulsarClientException {
+    public void sendManyMsgTest() throws PulsarClientException {
         String topic = "persistent://public/default/consumerPullEarliestPositionTestTopic5";
         PulsarClient pulsarClient = getClient(clientConfig);
         Producer producer = pulsarClient.newProducer(Schema.STRING).producerName(topic+"-Producer").
@@ -147,9 +148,10 @@ public class WqPulsar {
         ExecutorService executor = Executors.newFixedThreadPool(100);
         AtomicLong c = new AtomicLong(0);
         List<Future> futures = new ArrayList<>(100);
-        for(int i=0;i<300;i++){
+        Long start = System.currentTimeMillis();
+
+        for(int i=0;i<500;i++){
             futures.add(executor.submit(()->{
-                Long start = System.currentTimeMillis();
 
                 while(System.currentTimeMillis()-start<1000){
                     String msg = "msg-"+c.addAndGet(2);
@@ -175,53 +177,124 @@ public class WqPulsar {
         });
         System.out.println(String.format("total count:%s", c.get(), System.currentTimeMillis()-topstart));
 
-
-
     }
 
     /**
      * 测试 消费者 读取位置
+     * 结论：
+     * 消费者subscriptionInitialPosition配置的含义：
+     * 订阅组第一次消费时如何决定读取起始位置
+     * Earliest：当前消息队列最早的消息（包含最早那条消息）
+     * Latest：当前消息队列最后的消息（不包含最后那条消息）
      */
     public static void consumerPullPositionTest() throws PulsarClientException {
         PulsarClient pulsarClient = getClient(clientConfig);
-       Consumer c1 =  pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullEarliestPositionTestTopic5").
+       Consumer c1 =  pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/position-test-1").
                 consumerName("consumerPullEarliestPositionTestConsumer2").
-                subscriptionName("consumerPullEarliestPositionTestSubscription").
-//                subscriptionInitialPosition(SubscriptionInitialPosition.Earliest).messageListener((consumer, msg) -> {
-//                    try {
-//                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
-//                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
-//                        consumer.acknowledge(msg);
-//                        int a = 1/0;
-//                    } catch (PulsarClientException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }).
-                subscribe();
-        consume(c1);
-        Consumer c2 =   pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumerPullEarliestPositionTestTopic5").
+                subscriptionName("consumerPullEarliestPositionTestSubscription3").
+               subscriptionType(SubscriptionType.Shared).
+                subscriptionInitialPosition(SubscriptionInitialPosition.Earliest)
+               .messageListener((consumer, msg) -> {
+                    try {
+                        System.out.println(String.format("time: %s, msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+                                System.currentTimeMillis(), msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+
+                    } catch (PulsarClientException e) {
+                        e.printStackTrace();
+                    }
+
+                }).subscribe();
+
+        Consumer c2 =   pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/position-test-1").
                 consumerName("consumerPullLatestPositionTestConsumer2").
-                subscriptionName("consumerPullLatestPositionTestSubscription").
-//                subscriptionInitialPosition(SubscriptionInitialPosition.Latest).messageListener((consumer, msg) -> {
-//                    try {
-//                        System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
-//                                msg.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
-//                        consumer.acknowledge(msg);
-//                        int a = 1/0;
-//                    } catch (PulsarClientException e) {
-//                        e.printStackTrace();
-//                    }
-//                }).
-                subscribe();
-         consume(c2);
+                subscriptionName("consumerPullLatestPositionTestSubscription3").
+                subscriptionType(SubscriptionType.Shared).
+                subscriptionInitialPosition(SubscriptionInitialPosition.Latest)
+                .messageListener((consumer, msg1) -> {
+                    try {
+                        System.out.println(String.format("time: %s, msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+                                System.currentTimeMillis(), msg1.getTopicName(), consumer.getConsumerName(), consumer.getLastMessageId().toString(), msg1.getMessageId().toString(), msg1.getValue()));
+
+                    } catch (PulsarClientException e) {
+                        e.printStackTrace();
+                    }
+                }).subscribe();
     }
 
-    private static void consume(Consumer c1) throws PulsarClientException {
+
+    /**
+     * 发送消息
+     */
+    @Test
+    public void sendTest() throws PulsarClientException {
+        String topic = "persistent://public/default/consumer-retry";
+//        String topic = "persistent://public/default/position-test-1";
+
+        PulsarClient pulsarClient = getClient(clientConfig);
+        Producer producer = pulsarClient.newProducer(Schema.STRING).producerName(topic + "-Producer").
+                topic(topic).create();
+        String m = "msg: "+System.currentTimeMillis();
+        System.out.println(m);
+        producer.send(m);
+    }
+
+
+
+    /**
+     * 测试 重试
+     * 结论：
+     *  consumerBuilder.enableRetry(true) 会开启重试, 消费者不确认，消费者端会重试(不会阻塞下条消息消费)，失败指定次数后确认原消息并放入死信队列。
+     *  consumer.reconsumeLater  会把原消息确认，并放入重试队列中。 消费者会自动订阅重试队列， 失败指定次数后 放入死信队列。
+     */
+    public static void testConsumerRetry() throws PulsarClientException {
+        PulsarClient pulsarClient = getClient(clientConfig);
+
+        Consumer c1 =  pulsarClient.newConsumer(Schema.STRING).topic("persistent://public/default/consumer-retry")
+                .consumerName("consumerRetryTopicTestConsumer")
+                .subscriptionName("consumerRetryTopicTestSubscription")
+                .enableRetry(true)
+                .deadLetterPolicy(
+                        DeadLetterPolicy.builder().maxRedeliverCount(1).initialSubscriptionName("deadletter-sub").build()
+                ).subscriptionType(SubscriptionType.Shared)
+                .messageListener((c, msg)->{
+
+                    try {
+                        System.out.println(String.format("time: %s, msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+                                System.currentTimeMillis(), msg.getTopicName(), c.getConsumerName(), c.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+                        System.out.println("msg properties: "+msg.getProperties());
+                        c.negativeAcknowledge(msg);
+                    } catch (PulsarClientException e) {
+                        e.printStackTrace();
+                    }
+
+                })
+                .subscribe();
+
+        Consumer dlqConsumer =  pulsarClient.newConsumer(Schema.STRING)
+                .topic("persistent://public/default/consumer-retry-consumerRetryTopicTestSubscription-DLQ")
+                .consumerName("consumerRetryTopicTestConsumer")
+                .subscriptionName("consumerRetryTopicTestSubscription")
+                .subscriptionType(SubscriptionType.Shared)
+                .messageListener((c, msg)->{
+
+                    try {
+                        System.out.println(String.format("time: %s ,msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
+                                System.currentTimeMillis(),msg.getTopicName(), c.getConsumerName(), c.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
+
+                    } catch (PulsarClientException e) {
+                        e.printStackTrace();
+                    }
+
+                })
+                .subscribe();
+    }
+
+    private static Message consume(Consumer c1) throws PulsarClientException {
         Message msg = c1.receive();
         System.out.println(String.format("msg topic %s, consumer %s, consumer last available msg id %s, msg id: %s data: %s",
                                 msg.getTopicName(), c1.getConsumerName(), c1.getLastMessageId().toString(), msg.getMessageId().toString(), msg.getValue()));
-        c1.acknowledge(msg);
+
+        return msg;
     }
 
     /**
@@ -313,8 +386,9 @@ public class WqPulsar {
     }
 
 
-
     public static void main(String[] args) throws PulsarClientException, PulsarAdminException, InterruptedException {
-        consumerPullPositionTest();
+//        consumerPullPositionTest();
+        testConsumerRetry();
     }
+
 }

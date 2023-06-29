@@ -1,4 +1,4 @@
-package leetcode;
+package algorithm.leetcode;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ import java.util.*;
  *
  * 示例：
  *
- * s = "leetcode"
+ * s = "algorithm.leetcode"
  * 返回 0
  *
  * s = "loveleetcode"

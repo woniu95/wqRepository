@@ -1,7 +1,6 @@
-package leetcode;
+package algorithm.leetcode;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
